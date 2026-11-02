@@ -1,32 +1,40 @@
 # NTUMBA-TRADER 🌍📈
-The Real Multi-Market Trading Platform - From Kinshasa to the World.
 
-> Built without a PC, on Android. Testing first, selling later.
+The Real Multi-Market Trading Platform — built for operators who want performance, discipline, and a scalable trading workflow.
 
-## Markets Supported
-- [x] Crypto (Binance API)
-- [x] Forex (OANDA / TwelveData)
-- [x] Stocks US (Alpaca)
+From Kinshasa to the world: crypto, forex, and U.S. equities, all unified into one trading intelligence platform.
 
-## Production stack
-- Frontend: Next.js dashboard on Vercel
-- Backend: FastAPI analysis engine on Render or VPS
-- Database: PostgreSQL + Redis
-- Bot: Python + CCXT paper trading
-- Security: JWT + risk controls + environment-based config
+## What is included
+- Multi-market dashboard
+- Portfolio and risk monitoring
+- Strategy signal engine
+- Paper trading workflow
+- Admin-ready backend APIs
+- JWT authentication layer
+- SQLAlchemy database models
+- Paylora-ready payment endpoints
+- Docker deployment setup
 
-## Philosophy
-No fake promises. Every signal has backtest proof + Risk Management (2% max, SL/TP mandatory).
+## Architecture
+- `/frontend` — Next.js dashboard and trading UI
+- `/backend` — FastAPI analytics, auth, payments, and orchestration layer
+- `/bot` — Python paper-trading engine with risk logic
 
-Founder: Héritier Ntumba @ntumbah02-lang
-Paylora Integration for DRC Payments
+## Core system capabilities
+- Crypto: Binance
+- Forex: OANDA / TwelveData
+- US Stocks: Alpaca
+- Paper trading by default
+- SL / TP enforcement logic
+- Risk-weighted position sizing
+- Secure session tokens and account registration
 
-## Run locally
+## Local setup
+
+### Backend
 ```bash
-docker compose up --build
-```
-
-## Production notes
-- Set `SECRET_KEY` and `DATABASE_URL` in environment variables.
-- Use Postgres in production instead of SQLite.
-- Keep maximum risk per trade below 2%.
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
