@@ -9,20 +9,22 @@ Built without a PC, on Android. Testing first, selling later.
 - [x] Forex (OANDA / TwelveData)
 - [x] Stocks US (Alpaca)
 
-## System architecture
-- `/frontend` — Next.js dashboard (Vercel)
-- `/backend` — FastAPI analytics engine (Render)
-- `/bot` — Python bot + CCXT (paper trading first)
+## Platform architecture
+- `/frontend` — Next.js trading dashboard
+- `/backend` — FastAPI analytics and portfolio API
+- `/bot` — Python paper-trading engine
 
-## Philosophy
-No fake promises. Every signal has backtest proof + risk management (2% max, SL/TP mandatory).
-
-Founder: Héritier Ntumba @ntumbah02-lang
-Paylora integration for DRC payments.
+## Core features
+- market overview dashboard
+- portfolio and risk summary
+- multi-market signal feed
+- paper-trading workflow
+- Paylora-ready payment layer
+- API-first backend
 
 ## Quick start
 
-### 1) Backend
+### Backend
 ```bash
 cd backend
 python -m venv .venv
@@ -31,14 +33,14 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 2) Frontend
+### Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### 3) Bot
+### Bot
 ```bash
 cd bot
 python -m venv .venv
@@ -47,8 +49,28 @@ pip install -r requirements.txt
 python main.py
 ```
 
-## Environment variables
-Copy the `.env.example` files in each app folder and adapt them to your keys.
+### Docker
+```bash
+docker compose up --build
+```
 
-## Current status
-This repository now includes a working starter structure for the platform, including the dashboard, API, and trading bot skeleton with paper trading logic.
+## Environment variables
+Copy and customize the `.env.example` files for backend, frontend, and bot before running the app.
+
+## MVP status
+This repository now includes a working full-stack MVP scaffold covering:
+- backend API
+- dashboard frontend
+- market signal view
+- paper-trading bot
+- payment-ready structure
+- Docker support
+
+## Roadmap
+- live exchange integration
+- authentication and user accounts
+- real database persistence
+- user subscriptions and Paylora checkout
+- real order execution
+- backtesting engine
+- production deployment

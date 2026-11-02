@@ -10,6 +10,7 @@ services:
       - ./backend:/app
     environment:
       - APP_ENV=development
+      - APP_NAME=NTUMBA TRADER
 
   frontend:
     build: ./frontend
