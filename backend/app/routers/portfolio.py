@@ -1,12 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-from app.data import ORDERS, POSITIONS
+from app.auth import get_db
+from app.data import BACKTEST, MARKETS, SIGNALS
 
-router = APIRouter(prefix="/api", tags=["portfolio"])
+router = APIRouter(prefix="/api", tags=["markets"])
 
 
-@router.get("/portfolio")
-async def get_portfolio():
+@router.get("/summary")
+async def get_summary(db: Session = Depends(get_db)):
     return {
         "portfolio": {
             "value": 184250.7,
@@ -14,15 +16,22 @@ async def get_portfolio():
             "daily_change": 2.31,
             "risk": 1.8,
             "allocation": {"BTC": 38, "FOREX": 28, "STOCKS": 22, "CASH": 12},
-        }
+        },
+        "markets": MARKETS,
+        "last_update": "2026-11-02T09:45:12Z",
     }
 
 
-@router.get("/positions")
-async def get_positions():
-    return POSITIONS
+@router.get("/markets")
+async def get_markets(db: Session = Depends(get_db)):
+    return MARKETS
 
 
-@router.get("/orders")
-async def get_orders():
-    return ORDERS
+@router.get("/signals")
+async def get_signals(db: Session = Depends(get_db)):
+    return {"status": "paper-trading", "signals": SIGNALS}
+
+
+@router.get("/backtest")
+async def get_backtest(db: Session = Depends(get_db)):
+    return BACKTEST

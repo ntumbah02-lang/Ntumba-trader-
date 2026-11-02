@@ -1,23 +1,33 @@
-from fastapi import APIRouter
+from __future__ import annotations
 
-from app.data import PAYMENT_STATUS
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-router = APIRouter(prefix="/api/payments", tags=["payments"])
+from app.auth import get_current_user, get_db
+from app.data import ORDERS, POSITIONS
+
+router = APIRouter(prefix="/api", tags=["portfolio"])
 
 
-@router.post("/checkout")
-async def checkout_payment():
+@router.get("/portfolio")
+async def get_portfolio(db: Session = Depends(get_db), user=Depends(get_current_user)):
     return {
-        "status": "pending",
-        "checkout_id": "NTB-CHK-2026-2",
-        "amount": 49.0,
-        "currency": "USD",
-        "plan": "premium",
-        "provider": "Paylora",
-        "checkout_url": "https://paylora.demo/checkout/NTB-CHK-2026-2",
+        "portfolio": {
+            "value": 184250.7,
+            "pnl": 12.45,
+            "daily_change": 2.31,
+            "risk": 1.8,
+            "allocation": {"BTC": 38, "FOREX": 28, "STOCKS": 22, "CASH": 12},
+            "owner": user.email,
+        }
     }
 
 
-@router.get("/status")
-async def get_payment_status():
-    return PAYMENT_STATUS
+@router.get("/positions")
+async def get_positions(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return {"positions": POSITIONS, "owner": user.email}
+
+
+@router.get("/orders")
+async def get_orders(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return {"orders": ORDERS, "owner": user.email}

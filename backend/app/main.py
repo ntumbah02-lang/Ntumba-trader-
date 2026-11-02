@@ -34,3 +34,12 @@ async def health_check():
         "service": settings.app_name,
         "environment": settings.environment,
     }
+
+
+@app.get("/")
+async def root():
+    return {
+        "project": settings.app_name,
+        "status": "active",
+        "endpoints": ["/api/auth/login", "/api/auth/register", "/api/summary", "/api/portfolio"],
+    }
