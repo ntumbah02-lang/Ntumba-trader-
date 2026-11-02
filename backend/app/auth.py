@@ -14,7 +14,7 @@ from app.db import SessionLocal
 from app.models import User
 
 SECRET_KEY = os.getenv("SECRET_KEY", "ntumba-trader-secret-change-me")
-ALGORITHM = "HS256"
+ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -52,7 +52,7 @@ def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(auth_scheme),
     db: Session = Depends(get_db),
 ):
-    token = credentials.credentials
+    token = credentials.credentials if credentials else None
     if token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
 

@@ -11,6 +11,11 @@ services:
     environment:
       - APP_ENV=development
       - APP_NAME=NTUMBA TRADER
+      - DATABASE_URL=sqlite:///./ntumba_trader.db
+      - SECRET_KEY=ntumba-trader-secret-change-me
+    depends_on:
+      - postgres
+      - redis
 
   frontend:
     build: ./frontend
@@ -30,3 +35,22 @@ services:
       - ./bot:/app
     environment:
       - APP_ENV=development
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ntumba_trader
+      POSTGRES_USER: trader
+      POSTGRES_PASSWORD: trader123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:

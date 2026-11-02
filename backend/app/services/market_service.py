@@ -32,14 +32,16 @@ class MarketService:
         return PAYMENT_STATUS
 
     def get_signal_board(self) -> list[dict[str, Any]]:
-        return [
-            {
-                "symbol": item["symbol"] if "symbol" in item else item["name"],
-                "side": item.get("signal", "HOLD").lower(),
-                "entry": item["price"],
-                "stop_loss": item["price"] * 0.97,
-                "take_profit": item["price"] * 1.08,
-                "confidence": item.get("confidence", 70),
-            }
-            for item in MARKETS
-        ]
+        output: list[dict[str, Any]] = []
+        for item in MARKETS:
+            output.append(
+                {
+                    "symbol": item.get("name", "UNKNOWN"),
+                    "side": item.get("signal", "HOLD").lower(),
+                    "entry": item["price"],
+                    "stop_loss": item["price"] * 0.97,
+                    "take_profit": item["price"] * 1.08,
+                    "confidence": item.get("confidence", 70),
+                }
+            )
+        return output

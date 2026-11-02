@@ -1,23 +1,19 @@
 from __future__ import annotations
 
-from typing import Any
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.db import init_db
 from app.routers.analytics import router as analytics_router
 from app.routers.auth import router as auth_router
 from app.routers.markets import router as markets_router
-from app.routers.payments import router as payments_router
 from app.routers.portfolio import router as portfolio_router
 
 app = FastAPI(
     title=settings.app_name,
     version="1.0.0",
-    description="NTUMBA TRADER — multi-market signal and trading platform API",
-    docs_url="/docs",
-    redoc_url="/redoc",
+    description="NTUMBA TRADER production-grade platform API",
 )
 
 app.add_middleware(
@@ -31,12 +27,16 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(markets_router)
 app.include_router(portfolio_router)
-app.include_router(payments_router)
 app.include_router(analytics_router)
 
 
+@app.on_event("startup")
+def startup() -> None:
+    init_db()
+
+
 @app.get("/health")
-async def health_check() -> dict[str, Any]:
+async def health_check():
     return {
         "status": "ok",
         "service": settings.app_name,
@@ -45,24 +45,20 @@ async def health_check() -> dict[str, Any]:
     }
 
 
-@app.get("/api/healthz")
-async def healthz() -> dict[str, Any]:
+@app.get("/api/summary")
+async def summary():
     return {
-        "status": "healthy",
-        "message": "Everything is operational",
-    }
-
-
-@app.get("/")
-async def root() -> dict[str, Any]:
-    return {
-        "project": settings.app_name,
-        "status": "active",
-        "features": [
-            "multi-market data",
-            "paper trading",
-            "portfolio oversight",
-            "risk controls",
-            "auth and payments",
+        "portfolio": {
+            "value": 184250.7,
+            "pnl": 12.45,
+            "daily_change": 2.31,
+            "risk": 1.8,
+        },
+        "markets": [
+            {"name": "BTC/USDT", "price": 67240.56, "change": 2.8, "signal": "BUY", "confidence": 84},
+            {"name": "EUR/USD", "price": 1.0862, "change": 0.5, "signal": "HOLD", "confidence": 68},
+            {"name": "AAPL", "price": 218.72, "change": 1.2, "signal": "BUY", "confidence": 76},
+            {"name": "XAU/USD", "price": 2345.42, "change": -0.3, "signal": "SELL", "confidence": 61},
         ],
+        "last_update": "2026-11-02T09:45:12Z",
     }
