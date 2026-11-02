@@ -1,0 +1,92 @@
+const mockData = {
+  portfolio: {
+    value: 184250.7,
+    pnl: 12.45,
+    dailyChange: 2.31,
+    risk: 1.8
+  },
+  markets: [
+    { name: 'BTC/USDT', price: 67240.56, change: 2.8, signal: 'BUY', confidence: 84 },
+    { name: 'EUR/USD', price: 1.0862, change: 0.5, signal: 'HOLD', confidence: 68 },
+    { name: 'AAPL', price: 218.72, change: 1.2, signal: 'BUY', confidence: 76 },
+    { name: 'XAU/USD', price: 2345.42, change: -0.3, signal: 'SELL', confidence: 61 }
+  ],
+  lastUpdate: '2026-11-02 09:45:12 UTC'
+};
+
+export default function Home() {
+  return (
+    <main style={{ padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: 'sans-serif' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+          <p style={{ margin: 0, color: '#7dd3fc', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>NTUMBA-TRADER</p>
+          <h1 style={{ margin: '0.5rem 0 0', fontSize: '2.5rem' }}>Market Overview</h1>
+        </div>
+        <div style={{ background: '#0f172a', color: '#e2e8f0', padding: '0.75rem 1rem', borderRadius: 12 }}>
+          Updated: {mockData.lastUpdate}
+        </div>
+      </header>
+
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        <StatCard label="Portfolio value" value={`$${mockData.portfolio.value.toLocaleString()}`} tone="blue" />
+        <StatCard label="P&L" value={`+${mockData.portfolio.pnl}%`} tone="green" />
+        <StatCard label="Daily change" value={`+${mockData.portfolio.dailyChange}%`} tone="cyan" />
+        <StatCard label="Risk" value={`${mockData.portfolio.risk}%`} tone="orange" />
+      </section>
+
+      <section style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 18, overflow: 'hidden' }}>
+        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #1f2937', display: 'flex', justifyContent: 'space-between' }}>
+          <h2 style={{ margin: 0 }}>Markets</h2>
+          <span style={{ color: '#94a3b8' }}>Multi-market signal board</span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', padding: '1rem' }}>
+          {mockData.markets.map((market) => (
+            <div key={market.name} style={{ background: '#0f172a', borderRadius: 14, padding: '1rem', border: '1px solid #1e293b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong>{market.name}</strong>
+                <span
+                  style={{
+                    padding: '0.3rem 0.6rem',
+                    borderRadius: 999,
+                    background: market.signal === 'BUY' ? '#14532d' : market.signal === 'SELL' ? '#4c0519' : '#1f2937',
+                    color: '#fff',
+                    fontSize: '0.8rem',
+                    fontWeight: 700
+                  }}
+                >
+                  {market.signal}
+                </span>
+              </div>
+              <p style={{ fontSize: '1.7rem', fontWeight: 700, margin: '0.75rem 0 0.25rem' }}>
+                {typeof market.price === 'number' && market.price < 10 ? market.price.toFixed(4) : market.price.toLocaleString()}
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1', fontSize: '0.9rem' }}>
+                <span>{market.change > 0 ? '+' : ''}{market.change}%</span>
+                <span>{market.confidence}% confidence</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function StatCard({ label, value, tone }: { label: string; value: string; tone: 'blue' | 'green' | 'cyan' | 'orange' }) {
+  const palette = {
+    blue: { bg: '#0f172a', border: '#1d4ed8', text: '#bfdbfe' },
+    green: { bg: '#0f172a', border: '#16a34a', text: '#bbf7d0' },
+    cyan: { bg: '#0f172a', border: '#0891b2', text: '#a5f3fc' },
+    orange: { bg: '#0f172a', border: '#f59e0b', text: '#fed7aa' }
+  };
+
+  const style = palette[tone];
+
+  return (
+    <div style={{ background: style.bg, border: `1px solid ${style.border}`, borderRadius: 16, padding: '1rem 1.25rem' }}>
+      <p style={{ margin: 0, color: '#94a3b8' }}>{label}</p>
+      <h3 style={{ margin: '0.5rem 0 0', color: style.text, fontSize: '1.8rem' }}>{value}</h3>
+    </div>
+  );
+}
