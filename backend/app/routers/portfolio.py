@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.auth import get_db
-from app.data import BACKTEST, MARKETS, SIGNALS
+from app.auth import get_current_user, get_db
+from app.data import ORDERS, POSITIONS
 
-router = APIRouter(prefix="/api", tags=["markets"])
+router = APIRouter(prefix="/api", tags=["portfolio"])
 
 
-@router.get("/summary")
-async def get_summary(db: Session = Depends(get_db)):
+@router.get("/portfolio")
+async def get_portfolio(db: Session = Depends(get_db), user=Depends(get_current_user)):
     return {
         "portfolio": {
             "value": 184250.7,
@@ -16,22 +18,27 @@ async def get_summary(db: Session = Depends(get_db)):
             "daily_change": 2.31,
             "risk": 1.8,
             "allocation": {"BTC": 38, "FOREX": 28, "STOCKS": 22, "CASH": 12},
-        },
-        "markets": MARKETS,
-        "last_update": "2026-11-02T09:45:12Z",
+            "owner": user.email,
+        }
     }
 
 
-@router.get("/markets")
-async def get_markets(db: Session = Depends(get_db)):
-    return MARKETS
+@router.get("/positions")
+async def get_positions(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return {"positions": POSITIONS, "owner": user.email}
 
 
-@router.get("/signals")
-async def get_signals(db: Session = Depends(get_db)):
-    return {"status": "paper-trading", "signals": SIGNALS}
+@router.get("/orders")
+async def get_orders(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return {"orders": ORDERS, "owner": user.email}
 
 
-@router.get("/backtest")
-async def get_backtest(db: Session = Depends(get_db)):
-    return BACKTEST
+@router.get("/risk")
+async def get_risk_summary(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return {
+        "owner": user.email,
+        "risk": 1.8,
+        "max_daily_loss": 0.02,
+        "stop_loss_required": True,
+        "exposure": 0.42,
+    }

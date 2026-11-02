@@ -12,24 +12,22 @@ export default function LoginPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-
     try {
       const response = await fetch("http://localhost:8000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
       if (data.status === "success") {
         localStorage.setItem("ntumba-token", data.token);
         router.push("/dashboard");
       } else {
-        setMessage(data.message || "Login failed");
+        setMessage(data.detail || data.message || "Login failed");
       }
     } catch (error) {
-      setMessage("Unable to reach backend. Start the API server first.");
       console.error(error);
+      setMessage("Unable to reach backend. Start the API server first.");
     }
   };
 
@@ -50,7 +48,7 @@ export default function LoginPage() {
         </form>
         {message ? <p className="form-note">{message}</p> : null}
         <p className="form-note">
-          No account yet? <Link href="/register">Create one</Link>
+          No account? <Link href="/register">Create one</Link>
         </p>
       </div>
     </main>

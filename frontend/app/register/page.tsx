@@ -13,24 +13,22 @@ export default function RegisterPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-
     try {
       const response = await fetch("http://localhost:8000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
-
       const data = await response.json();
       if (data.status === "success") {
         localStorage.setItem("ntumba-token", data.token);
         router.push("/dashboard");
       } else {
-        setMessage(data.message || "Registration failed");
+        setMessage(data.detail || data.message || "Registration failed");
       }
     } catch (error) {
-      setMessage("Unable to reach backend. Start the API server first.");
       console.error(error);
+      setMessage("Unable to reach backend. Start the API server first.");
     }
   };
 

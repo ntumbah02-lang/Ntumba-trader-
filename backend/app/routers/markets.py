@@ -1,50 +1,39 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.auth import create_access_token, get_db, hash_password, verify_password
-from app.models import User
-from app.schemas import UserLogin, UserRegister
+from app.auth import get_db
+from app.data import BACKTEST, MARKETS, SIGNALS
 
-router = APIRouter(prefix="/api/auth", tags=["auth"])
+router = APIRouter(prefix="/api", tags=["markets"])
 
 
-@router.post("/register")
-async def register_user(payload: UserRegister, db: Session = Depends(get_db)):
-    existing_user = db.query(User).filter(User.email == payload.email).first()
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
-
-    user = User(
-        name=payload.name,
-        email=payload.email,
-        password_hash=hash_password(payload.password),
-        plan="starter",
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-
-    token = create_access_token(user.email)
+@router.get("/summary")
+async def get_summary(db: Session = Depends(get_db)):
     return {
-        "status": "success",
-        "message": "User registered successfully",
-        "user": {"id": user.id, "name": user.name, "email": user.email, "plan": user.plan},
-        "token": token,
+        "portfolio": {
+            "value": 184250.7,
+            "pnl": 12.45,
+            "daily_change": 2.31,
+            "risk": 1.8,
+            "allocation": {"BTC": 38, "FOREX": 28, "STOCKS": 22, "CASH": 12},
+        },
+        "markets": MARKETS,
+        "last_update": "2026-11-02T09:45:12Z",
     }
 
 
-@router.post("/login")
-async def login_user(payload: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == payload.email).first()
-    if not user or not verify_password(payload.password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+@router.get("/markets")
+async def get_markets(db: Session = Depends(get_db)):
+    return MARKETS
 
-    token = create_access_token(user.email)
-    return {
-        "status": "success",
-        "message": "Logged in successfully",
-        "user": {"id": user.id, "name": user.name, "email": user.email, "plan": user.plan},
-        "token": token,
-    }
+
+@router.get("/signals")
+async def get_signals(db: Session = Depends(get_db)):
+    return {"status": "paper-trading", "signals": SIGNALS}
+
+
+@router.get("/backtest")
+async def get_backtest(db: Session = Depends(get_db)):
+    return BACKTEST
