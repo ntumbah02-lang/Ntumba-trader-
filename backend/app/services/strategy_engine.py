@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 
@@ -14,17 +14,17 @@ class TradeLogEntry:
     take_profit: float
     confidence: int
     risk: float
-    status: str
+    status: str = "paper"
 
 
 class StrategyEngine:
     def __init__(self, log_file: str = "paper_trade_log.json"):
         self.log_file = Path(log_file)
 
-    def create_trade(self, symbol: str, price: float) -> TradeLogEntry:
+    def create_trade(self, symbol: str, price: float, side: str = "buy") -> TradeLogEntry:
         signal = TradeLogEntry(
             symbol=symbol,
-            side="buy",
+            side=side,
             entry=price,
             stop_loss=price * 0.97,
             take_profit=price * 1.08,
@@ -50,3 +50,14 @@ class StrategyEngine:
                 if line:
                     entries.append(json.loads(line))
         return entries
+
+    def score_signal(self, symbol: str, price: float, confidence: int = 84) -> dict:
+        return {
+            "symbol": symbol,
+            "score": min(100, confidence + 10),
+            "risk": 0.02,
+            "direction": "buy",
+            "entry": price,
+            "stop_loss": price * 0.97,
+            "take_profit": price * 1.08,
+        }

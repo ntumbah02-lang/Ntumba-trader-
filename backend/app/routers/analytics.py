@@ -15,7 +15,7 @@ async def analytics_overview(db: Session = Depends(get_db), user=Depends(get_cur
         "owner": user.email,
         "portfolio_value": 184250.7,
         "daily_return": 2.31,
-        "Sharpe": 1.82,
+        "sharpe": 1.82,
         "volatility": 12.4,
         "drawdown": 8.7,
         "markets_tracked": len(MARKETS),
