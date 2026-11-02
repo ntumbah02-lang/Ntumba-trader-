@@ -1,17 +1,52 @@
 from __future__ import annotations
 
+import json
+from dataclasses import dataclass, asdict
+from pathlib import Path
+
+
+@dataclass
+class TradeLogEntry:
+    symbol: str
+    side: str
+    entry: float
+    stop_loss: float
+    take_profit: float
+    confidence: int
+    risk: float
+    status: str
+
 
 class StrategyEngine:
-    def calculate_position_size(self, account_balance: float, risk_percent: float, stop_distance: float) -> float:
-        if stop_distance <= 0:
-            return 0.0
-        risk_amount = account_balance * risk_percent
-        return risk_amount / stop_distance
+    def __init__(self, log_file: str = "paper_trade_log.json"):
+        self.log_file = Path(log_file)
 
-    def expected_move(self, entry: float, stop_loss: float, take_profit: float) -> dict[str, float]:
-        risk = abs(entry - stop_loss)
-        reward = abs(take_profit - entry)
-        return {"risk": risk, "reward": reward, "rr_ratio": reward / risk if risk else 0.0}
+    def create_trade(self, symbol: str, price: float) -> TradeLogEntry:
+        signal = TradeLogEntry(
+            symbol=symbol,
+            side="buy",
+            entry=price,
+            stop_loss=price * 0.97,
+            take_profit=price * 1.08,
+            confidence=84,
+            risk=0.02,
+            status="paper",
+        )
+        self.write_log(signal)
+        return signal
 
-    def quality_score(self, confidence: int, rr_ratio: float) -> float:
-        return min(100.0, (confidence * 0.7) + (rr_ratio * 20))
+    def write_log(self, signal: TradeLogEntry) -> None:
+        payload = asdict(signal)
+        with self.log_file.open("a", encoding="utf-8") as file:
+            file.write(json.dumps(payload) + "\n")
+
+    def read_log(self) -> list[dict]:
+        if not self.log_file.exists():
+            return []
+        entries: list[dict] = []
+        with self.log_file.open("r", encoding="utf-8") as file:
+            for line in file:
+                line = line.strip()
+                if line:
+                    entries.append(json.loads(line))
+        return entries
